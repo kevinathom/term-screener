@@ -15,8 +15,8 @@ Note:
     consider installing older version:
         pip install tika==1.23
 """
-PDF_dir = "C:\\Users\\kevinat\\Downloads\\Research Spotlight Round 4"
-results_file = "C:\\Users\\kevinat\\Downloads\\results_20220207.csv"
+PDF_dir = "C:\\Users\\kevinat\\Documents\\GitHub\\term-screener\\data\\Research Spotlight Round 4"
+results_file = "C:\\Users\\kevinat\\Documents\\GitHub\\term-screener\\data\\results_20220207.csv"
 
 """
 Build preliminary functions
