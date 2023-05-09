@@ -16,10 +16,11 @@ Note:
         pip install tika==1.23
 """
 from datetime import date
+import pandas as pd
 
 data_dir = "C:\\Users\\kevinat\\Documents\\GitHub\\term-screener\\data\\"
-PDF_dir = data_dir + "Research Spotlight Round 4"
-# TO DO: set location / read in set of terms to check
+term_set = pd.read_csv(data_dir + "terms.csv")
+
 
 """
 Build preliminary functions
@@ -79,7 +80,7 @@ UN_Comtrade = [] # Boolean (True = term found)
 Bests = [] # Boolean (True = term found)
 WARC = [] # Boolean (True = term found)
 Bizcomps = [] # Boolean (True = term found)
-for file in list_files(PDF_dir):
+for file in list_files(data_dir):
     # List the filename
     papers.append(file[(file.rindex('\\') + 1):-4])
     
@@ -125,20 +126,27 @@ for file in list_files(PDF_dir):
         # Extract the text content, removing line breaks and white space
         words = parser.from_file(file)['content'].replace("\n", "").replace(" ", "")
         
-        # Remove bloomberg.com
+        # Remove/Exclude terms
+        ## Ignores white space; Heeds punctuation and case
+        # TO DO: loop to clear all Exclude-flagged terms
         #words = words.replace("bloomberg.com", "").replace("Bloomberg.com", "")
+        
+        # Screen for punctuation-sensitive terms (and case-sensitive)
+        # TO DO: do it
         
         # Remove punctuation
         words = words.translate(str.maketrans('', '', string.punctuation))
         #words = [word for word in words if word.isalpha()]
         
         # Screen for case-sensitive terms
+        # TO DO: do it
         #CEIC.append('CEIC' in words or 'Ceic' in words)
         
         # Change text to lower case
         words = words.lower()
     
         # Screen for remaining terms
+        # TO DO: do below via loop
         PitchBook.append('PitchBook'.lower() in words)
         WRDS.append('WRDS'.lower() in words or 'Wharton Research Data Services'.lower() in words)
         AdSpender.append('AdSpender'.lower() in words or 'Adpender'.lower() in words)
@@ -179,7 +187,7 @@ for i in range(len(papers)):
         any_database.append(any([PitchBook[i], WRDS[i], AdSpender[i], Amadeus[i], Osiris[i], Bureau_van_Dijk[i], LexisNexis[i], Nexis_Uni[i], Data_Axle[i], BCIQ[i], Automotive_News_Data_Center[i], IndustriusCFO[i], SBRnet[i], Mergent[i], Hoovers[i], CB_Insights[i], Real_Capital_Analytics[i], REIS[i], Foundation_Directory[i], Preqin[i], Moodys[i], SimplyAnalytics[i], Global_Financial_Data[i], SRDS[i], UN_Comtrade[i], Bests[i], WARC[i], Bizcomps[i]]))
 
 # Export results
-from pandas import DataFrame
+#from pandas import DataFrame
 
 # TO DO: generate list dynamically
 result = {'Paper': papers,
@@ -213,6 +221,6 @@ result = {'Paper': papers,
           'WARC': WARC,
           'Bizcomps': Bizcomps}
 # TO DO: generate columns dynamically
-result = DataFrame(result, columns = ['Paper', 'Any_Database', 'PitchBook', 'WRDS', 'AdSpender', 'Amadeus', 'Osiris', 'Bureau_van_Dijk', 'LexisNexis', 'Nexis_Uni', 'Data_Axle', 'BCIQ', 'Automotive_News_Data_Center', 'IndustriusCFO', 'SBRnet', 'Mergent', 'Hoovers', 'CB_Insights', 'Real_Capital_Analytics', 'REIS', 'Foundation_Directory', 'Preqin', 'Moodys', 'SimplyAnalytics', 'Global_Financial_Data', 'SRDS', 'UN_Comtrade', 'Bests', 'WARC', 'Bizcomps'])
+result = pd.DataFrame(result, columns = ['Paper', 'Any_Database', 'PitchBook', 'WRDS', 'AdSpender', 'Amadeus', 'Osiris', 'Bureau_van_Dijk', 'LexisNexis', 'Nexis_Uni', 'Data_Axle', 'BCIQ', 'Automotive_News_Data_Center', 'IndustriusCFO', 'SBRnet', 'Mergent', 'Hoovers', 'CB_Insights', 'Real_Capital_Analytics', 'REIS', 'Foundation_Directory', 'Preqin', 'Moodys', 'SimplyAnalytics', 'Global_Financial_Data', 'SRDS', 'UN_Comtrade', 'Bests', 'WARC', 'Bizcomps'])
 
 result.to_csv(data_dir + "results_" + str(date.today()) + ".csv", index = None, header = True)
