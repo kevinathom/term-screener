@@ -43,43 +43,25 @@ def list_files(filepath = os.getcwd(), filetype = '.pdf'):
 """
 Run procedure
 """
-# Run algorithm on PDF files
+# Separate include/exclude terms
+term_include = term_set[~term_set['Exclude']]
+term_exclude = term_set[term_set['Exclude']]
+del term_set
+
+# Initialize storage
 import string
 import tika
 tika.initVM()
 from tika import parser
 
 papers = []
-# TO DO: generate objects dynamically
-PitchBook = [] # Boolean (True = term found)
-WRDS = [] # Boolean (True = term found)
-Wharton_Research_Data_Services = [] # Boolean (True = term found)
-AdSpender = [] # Boolean (True = term found)
-Amadeus = [] # Boolean (True = term found)
-Osiris = [] # Boolean (True = term found)
-Bureau_van_Dijk = [] # Boolean (True = term found)
-LexisNexis = [] # Boolean (True = term found)
-Nexis_Uni = [] # Boolean (True = term found)
-Data_Axle = [] # Boolean (True = term found)
-BCIQ = [] # Boolean (True = term found)
-Automotive_News_Data_Center = [] # Boolean (True = term found)
-IndustriusCFO = [] # Boolean (True = term found)
-SBRnet = [] # Boolean (True = term found)
-Mergent = [] # Boolean (True = term found)
-Hoovers = [] # Boolean (True = term found)
-CB_Insights = [] # Boolean (True = term found)
-Real_Capital_Analytics = [] # Boolean (True = term found)
-REIS = [] # Boolean (True = term found)
-Foundation_Directory = [] # Boolean (True = term found)
-Preqin = [] # Boolean (True = term found)
-Moodys = [] # Boolean (True = term found)
-SimplyAnalytics = [] # Boolean (True = term found)
-Global_Financial_Data = [] # Boolean (True = term found)
-SRDS = [] # Boolean (True = term found)
-UN_Comtrade = [] # Boolean (True = term found)
-Bests = [] # Boolean (True = term found)
-WARC = [] # Boolean (True = term found)
-Bizcomps = [] # Boolean (True = term found)
+# TO DO: Standardize canonical terms so EDGAR works
+canonicals = term_include['Canonical'].unique().tolist()
+for canonical in canonicals:
+    globals()[f'{canonical}'] = []
+del canonical
+
+# Run algorithm on PDF files
 for file in list_files(data_dir):
     # List the filename
     papers.append(file[(file.rindex('\\') + 1):-4])
