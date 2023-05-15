@@ -80,19 +80,38 @@ for file in list_files(data_dir):
     # TO DO: set options to flag which terms happen at which stage (e.g.: case-sensitive)
     # TO DO: handle variations on a term (e.g.: BCIQ or BioCentury) dynamically
     else:
-        # Extract the text content, removing line breaks and white space
-        words = parser.from_file(file)['content'].replace("\n", "").replace(" ", "")
+        # Extract the text content in four versions
+        ## All versions remove line breaks and white space
+        ## words_pc retains *p*unctuation and *c*apitalization...
+        words_pc = parser.from_file(file)['content'].replace("\n", "").replace(" ", "")
+        words_p = words_pc.lower()
+        words_c = words_pc.translate(str.maketrans('', '', string.punctuation))
+        words = words_pc.translate(str.maketrans('', '', string.punctuation)).lower()
         
         # Remove/Exclude terms
         ## Ignores white space; Heeds punctuation and case
         # TO DO: loop to clear all Exclude-flagged terms
-        #words = words.replace("bloomberg.com", "").replace("Bloomberg.com", "")
+        for index, row in term_exclude.iterrows():
+            if row['MatchPunctuation'] and row['MatchCase']:
+                words = words.replace(row['Variation'], "")
+            elif row['MatchPunctuation']:
+                row['Variation']
+            elif row['MatchCase']:
+                row['Variation']
+            else:
+                row['Variation']
+            #words = words.replace("bloomberg.com", "").replace("Bloomberg.com", "")
         
-        # Screen for punctuation-sensitive terms (and case-sensitive)
-        # TO DO: do it
+        # Check for matches with punctuation and case
+        
+        # Check for matches with punctuation, any case
+        
+        # Check for matches with case, no punctuation
+        
+        # Check for matches with no punctuation, any case
         
         # Remove punctuation
-        words = words.translate(str.maketrans('', '', string.punctuation))
+        #words = words.translate(str.maketrans('', '', string.punctuation))
         #words = [word for word in words if word.isalpha()]
         
         # Screen for case-sensitive terms
@@ -100,7 +119,7 @@ for file in list_files(data_dir):
         #CEIC.append('CEIC' in words or 'Ceic' in words)
         
         # Change text to lower case
-        words = words.lower()
+        #words = words.lower()
     
         # Screen for remaining terms
         # TO DO: do below via loop
