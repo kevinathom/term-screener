@@ -50,18 +50,19 @@ del term_set
 
 # Initialize storage
 import string
+
+papers = []
+canonicals = term_include['Canonical'].unique().tolist()
+canonicals_clean = [can.translate(str.maketrans('', '', string.punctuation)).replace(' ', '_').lower() for can in canonicals]
+for can in canonicals_clean:
+    globals()[f'{can}'] = []
+del can
+
+# Run algorithm on PDF files
 import tika
 tika.initVM()
 from tika import parser
 
-papers = []
-# TO DO: Standardize canonical terms so EDGAR works
-canonicals = term_include['Canonical'].unique().tolist()
-for canonical in canonicals:
-    globals()[f'{canonical}'] = []
-del canonical
-
-# Run algorithm on PDF files
 for file in list_files(data_dir):
     # List the filename
     papers.append(file[(file.rindex('\\') + 1):-4])
@@ -69,35 +70,9 @@ for file in list_files(data_dir):
     # When content metadata are missing
     if parser.from_file(file)['content'] is None:
         
-        # TO DO: generate objects dynamically
-        PitchBook.append('#N/A')
-        WRDS.append('#N/A')
-        AdSpender.append('#N/A')
-        Amadeus.append('#N/A')
-        Osiris.append('#N/A')
-        Bureau_van_Dijk.append('#N/A')
-        LexisNexis.append('#N/A')
-        Nexis_Uni.append('#N/A')
-        Data_Axle.append('#N/A')
-        BCIQ.append('#N/A')
-        Automotive_News_Data_Center.append('#N/A')
-        IndustriusCFO.append('#N/A')
-        SBRnet.append('#N/A')
-        Mergent.append('#N/A')
-        Hoovers.append('#N/A')
-        CB_Insights.append('#N/A')
-        Real_Capital_Analytics.append('#N/A')
-        REIS.append('#N/A')
-        Foundation_Directory.append('#N/A')
-        Preqin.append('#N/A')
-        Moodys.append('#N/A')
-        SimplyAnalytics.append('#N/A')
-        Global_Financial_Data.append('#N/A')
-        SRDS.append('#N/A')
-        UN_Comtrade.append('#N/A')
-        Bests.append('#N/A')
-        WARC.append('#N/A')
-        Bizcomps.append('#N/A')
+        for can in canonicals_clean:
+            globals()[f'{can}'].append('#N/A')
+        del can
       
     # When content metadata are present
     
