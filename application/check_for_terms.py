@@ -122,40 +122,12 @@ for file in list_files(data_dir):
             match_can.append(any(match_var))
         any_match.append(any(match_can))
         del match_can, i, match_var, index, row
+del words_pc, words_p, words_c, words_
 
 # Export results
-# TO DO: generate list dynamically
-result = {'Paper': papers,
-          'Any_Database': any_database,
-          'PitchBook': PitchBook,
-          'WRDS': WRDS,
-          'AdSpender': AdSpender,
-          'Amadeus': Amadeus,
-          'Osiris': Osiris,
-          'Bureau_van_Dijk': Bureau_van_Dijk,
-          'LexisNexis': LexisNexis,
-          'Nexis_Uni': Nexis_Uni,
-          'Data_Axle': Data_Axle,
-          'BCIQ': BCIQ,
-          'Automotive_News_Data_Center': Automotive_News_Data_Center,
-          'IndustriusCFO': IndustriusCFO,
-          'SBRnet': SBRnet,
-          'Mergent': Mergent,
-          'Hoovers': Hoovers,
-          'CB_Insights': CB_Insights,
-          'Real_Capital_Analytics': Real_Capital_Analytics,
-          'REIS': REIS,
-          'Foundation_Directory': Foundation_Directory,
-          'Preqin': Preqin,
-          'Moodys': Moodys,
-          'SimplyAnalytics': SimplyAnalytics,
-          'Global_Financial_Data': Global_Financial_Data,
-          'SRDS': SRDS,
-          'UN_Comtrade': UN_Comtrade,
-          'Bests': Bests,
-          'WARC': WARC,
-          'Bizcomps': Bizcomps}
-# TO DO: generate columns dynamically
-result = pd.DataFrame(result, columns = ['Paper', 'Any_Database', 'PitchBook', 'WRDS', 'AdSpender', 'Amadeus', 'Osiris', 'Bureau_van_Dijk', 'LexisNexis', 'Nexis_Uni', 'Data_Axle', 'BCIQ', 'Automotive_News_Data_Center', 'IndustriusCFO', 'SBRnet', 'Mergent', 'Hoovers', 'CB_Insights', 'Real_Capital_Analytics', 'REIS', 'Foundation_Directory', 'Preqin', 'Moodys', 'SimplyAnalytics', 'Global_Financial_Data', 'SRDS', 'UN_Comtrade', 'Bests', 'WARC', 'Bizcomps'])
+result = pd.DataFrame({'Paper': papers, 'Any Match': any_match})
+for i in list(range(len(canonicals))):
+    result[canonicals[i]] = globals()[f'{canonicals_clean[i]}']
+del i
 
 result.to_csv(data_dir + "results_" + str(date.today()) + ".csv", index = None, header = True)
