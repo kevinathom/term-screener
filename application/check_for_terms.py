@@ -68,11 +68,12 @@ term_exclude = term_set[term_set['Exclude']]
 del term_set
 
 # Initialize storage
-papers = []
+papers = [] # File names of papers
+any_match = [] # T/F matches for any canonical term
 canonicals = term_include['Canonical'].unique().tolist()
 canonicals_clean = [can.translate(str.maketrans('', '', string.punctuation)).replace(' ', '_').lower() for can in canonicals]
 for can in canonicals_clean:
-    globals()[f'{can}'] = []
+    globals()[f'{can}'] = [] # T/F matches for each canonical term
 del can
 
 # Run algorithm on PDF files
@@ -90,6 +91,7 @@ for file in list_files(data_dir):
         for can in canonicals_clean:
             globals()[f'{can}'].append('#N/A')
         del can
+        any_match.append('#N/A')
       
     # When content metadata are present
     else:
@@ -102,8 +104,9 @@ for file in list_files(data_dir):
         words_ = exclude_terms(term_exclude, words_pc.translate(str.maketrans('', '', string.punctuation)).lower())
         
         # Check text for term matches
+        match_any = [] # T/F matches for each canonical term 
         for i in list(range(len(canonicals))):
-            match = []
+            match = [] # T/F matches for each term variation 
             # Check each variation, conditional to arguments
             for index, row in term_include[term_include['Canonical'] == canonicals[i]].iterrows():
                 if row['MatchPunctuation'] and row['MatchCase']:
@@ -116,21 +119,11 @@ for file in list_files(data_dir):
                     match.append(row['Variation'].replace(" ", "").translate(str.maketrans('', '', string.punctuation)).lower() in words_)
             # Combine any matches for the canonical term
             globals()[f'{canonicals_clean[i]}'].append(any(match))
-        del i, match, index, row
-
-# ID where any database appears
-any_database = []
-for i in range(len(papers)):
-    # Condition for missing/present content data
-    # TO DO: treat terms dynamically
-    if any([type(PitchBook[i]) == str, type(WRDS[i]) == str, type(AdSpender[i]) == str, type(Amadeus[i]) == str, type(Osiris[i]) == str, type(Bureau_van_Dijk[i]) == str, type(LexisNexis[i]) == str, type(Nexis_Uni[i]) == str, type(Data_Axle[i]) == str, type(BCIQ[i]) == str, type(Automotive_News_Data_Center[i]) == str, type(IndustriusCFO[i]) == str, type(SBRnet[i]) == str, type(Mergent[i]) == str, type(Hoovers[i]) == str, type(CB_Insights[i]) == str, type(Real_Capital_Analytics[i]) == str, type(REIS[i]) == str, type(Foundation_Directory[i]) == str, type(Preqin[i]) == str, type(Moodys[i]) == str, type(SimplyAnalytics[i]) == str, type(Global_Financial_Data[i]) == str, type(SRDS[i]) == str, type(UN_Comtrade[i]) == str, type(Bests[i]) == str, type(WARC[i]) == str, type(Bizcomps[i]) == str]):
-        any_database.append('#N/A')
-    else:
-        any_database.append(any([PitchBook[i], WRDS[i], AdSpender[i], Amadeus[i], Osiris[i], Bureau_van_Dijk[i], LexisNexis[i], Nexis_Uni[i], Data_Axle[i], BCIQ[i], Automotive_News_Data_Center[i], IndustriusCFO[i], SBRnet[i], Mergent[i], Hoovers[i], CB_Insights[i], Real_Capital_Analytics[i], REIS[i], Foundation_Directory[i], Preqin[i], Moodys[i], SimplyAnalytics[i], Global_Financial_Data[i], SRDS[i], UN_Comtrade[i], Bests[i], WARC[i], Bizcomps[i]]))
+            match_any.append(any(match))
+        any_match.append(any(match_any))
+        del i, match, index, row, match_any
 
 # Export results
-#from pandas import DataFrame
-
 # TO DO: generate list dynamically
 result = {'Paper': papers,
           'Any_Database': any_database,
