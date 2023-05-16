@@ -68,12 +68,12 @@ term_exclude = term_set[term_set['Exclude']]
 del term_set
 
 # Initialize storage
-papers = [] # File names of papers
-any_match = [] # T/F matches for any canonical term
+papers = []
+any_match = []
 canonicals = term_include['Canonical'].unique().tolist()
 canonicals_clean = [can.translate(str.maketrans('', '', string.punctuation)).replace(' ', '_').lower() for can in canonicals]
 for can in canonicals_clean:
-    globals()[f'{can}'] = [] # T/F matches for each canonical term
+    globals()[f'{can}'] = []
 del can
 
 # Run algorithm on PDF files
@@ -104,24 +104,24 @@ for file in list_files(data_dir):
         words_ = exclude_terms(term_exclude, words_pc.translate(str.maketrans('', '', string.punctuation)).lower())
         
         # Check text for term matches
-        match_any = [] # T/F matches for each canonical term 
+        match_can = []
         for i in list(range(len(canonicals))):
-            match = [] # T/F matches for each term variation 
+            match_var = []
             # Check each variation, conditional to arguments
             for index, row in term_include[term_include['Canonical'] == canonicals[i]].iterrows():
                 if row['MatchPunctuation'] and row['MatchCase']:
-                    match.append(row['Variation'].replace(" ", "") in words_pc)
+                    match_var.append(row['Variation'].replace(" ", "") in words_pc)
                 elif row['MatchPunctuation']:
-                    match.append(row['Variation'].replace(" ", "").lower() in words_p)
+                    match_var.append(row['Variation'].replace(" ", "").lower() in words_p)
                 elif row['MatchCase']:
-                    match.append(row['Variation'].replace(" ", "").translate(str.maketrans('', '', string.punctuation)) in words_c)
+                    match_var.append(row['Variation'].replace(" ", "").translate(str.maketrans('', '', string.punctuation)) in words_c)
                 else:
-                    match.append(row['Variation'].replace(" ", "").translate(str.maketrans('', '', string.punctuation)).lower() in words_)
+                    match_var.append(row['Variation'].replace(" ", "").translate(str.maketrans('', '', string.punctuation)).lower() in words_)
             # Combine any matches for the canonical term
-            globals()[f'{canonicals_clean[i]}'].append(any(match))
-            match_any.append(any(match))
-        any_match.append(any(match_any))
-        del i, match, index, row, match_any
+            globals()[f'{canonicals_clean[i]}'].append(any(match_var))
+            match_can.append(any(match_var))
+        any_match.append(any(match_can))
+        del match_can, i, match_var, index, row
 
 # Export results
 # TO DO: generate list dynamically
