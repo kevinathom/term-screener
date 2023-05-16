@@ -40,6 +40,8 @@ def list_files(filepath = os.getcwd(), filetype = '.pdf'):
     return(paths)
 
 # Remove terms and flagged variations from text
+import string
+
 def exclude_terms(terms_df, text):
     # terms_df must be a pandas dataframe with columns:
     ## 'Variation' = terms to exclude
@@ -47,15 +49,15 @@ def exclude_terms(terms_df, text):
     ## 'MatchCase' = logical flag where True means case must match
     # text must be a single character string
     for index, row in terms_df.iterrows():
-        text = text.replace(row['Variation'], '')
+        text = text.replace(row['Variation'].replace(" ", ""), '')
         if row['MatchPunctuation'] and row['MatchCase']:
             continue
         if row['MatchPunctuation']:
-            text = text.replace(row['Variation'].lower(), '')
+            text = text.replace(row['Variation'].replace(" ", "").lower(), '')
         if row['MatchCase']:
-            text = text.replace(row['Variation'].translate(str.maketrans('', '', string.punctuation)), '')
+            text = text.replace(row['Variation'].replace(" ", "").translate(str.maketrans('', '', string.punctuation)), '')
         if not row['MatchPunctuation'] and not row['MatchCase']:
-            text = text.replace(row['Variation'].translate(str.maketrans('', '', string.punctuation)).lower(), '')
+            text = text.replace(row['Variation'].replace(" ", "").translate(str.maketrans('', '', string.punctuation)).lower(), '')
     return(text)
 
 
@@ -68,8 +70,6 @@ term_exclude = term_set[term_set['Exclude']]
 del term_set
 
 # Initialize storage
-import string
-
 papers = []
 canonicals = term_include['Canonical'].unique().tolist()
 canonicals_clean = [can.translate(str.maketrans('', '', string.punctuation)).replace(' ', '_').lower() for can in canonicals]
@@ -94,67 +94,31 @@ for file in list_files(data_dir):
         del can
       
     # When content metadata are present
-    # TO DO: use terms dynamically
-    # TO DO: set options to flag which terms happen at which stage (e.g.: case-sensitive)
-    # TO DO: handle variations on a term (e.g.: BCIQ or BioCentury) dynamically
     else:
         # Extract text content in four variations
-        ## All versions remove line breaks, white space, and excluded terms
+        ## All variations remove line breaks, white space, and excluded terms
         ## words_pc retains *p*unctuation and *c*apitalization...
         words_pc = exclude_terms(term_exclude, parser.from_file(file)['content'].replace("\n", "").replace(" ", ""))
         words_p = exclude_terms(term_exclude, words_pc.lower())
         words_c = exclude_terms(term_exclude, words_pc.translate(str.maketrans('', '', string.punctuation)))
         words_ = exclude_terms(term_exclude, words_pc.translate(str.maketrans('', '', string.punctuation)).lower())
         
-        # Check for matches with punctuation and case
-        
-        # Check for matches with punctuation, any case
-        
-        # Check for matches with case, no punctuation
-        
-        # Check for matches with no punctuation, any case
-        
-        # Remove punctuation
-        #words = words.translate(str.maketrans('', '', string.punctuation))
-        #words = [word for word in words if word.isalpha()]
-        
-        # Screen for case-sensitive terms
-        # TO DO: do it
-        #CEIC.append('CEIC' in words or 'Ceic' in words)
-        
-        # Change text to lower case
-        #words = words.lower()
-    
-        # Screen for remaining terms
-        # TO DO: do below via loop
-        PitchBook.append('PitchBook'.lower() in words)
-        WRDS.append('WRDS'.lower() in words or 'Wharton Research Data Services'.lower() in words)
-        AdSpender.append('AdSpender'.lower() in words or 'Adpender'.lower() in words)
-        Amadeus.append('Amadeus'.lower() in words)
-        Osiris.append('Osiris'.lower() in words)
-        Bureau_van_Dijk.append('Bureau van Dijk'.lower() in words or 'BVD'.lower() in words)
-        LexisNexis.append('LexisNexis'.lower() in words)
-        Nexis_Uni.append('Nexis Uni'.lower() in words)
-        Data_Axle.append('Data Axle'.lower() in words)
-        BCIQ.append('BCIQ'.lower() in words or 'BioCentury'.lower() in words)
-        Automotive_News_Data_Center.append('Automotive News Data Center'.lower() in words)
-        IndustriusCFO.append('IndustriusCFO'.lower() in words)
-        SBRnet.append('SBRnet'.lower() in words)
-        Mergent.append('Mergent'.lower() in words)
-        Hoovers.append('Hoovers'.lower() in words)
-        CB_Insights.append('CB Insights'.lower() in words)
-        Real_Capital_Analytics.append('Real Capital Analytics'.lower() in words)
-        REIS.append('REIS'.lower() in words)
-        Foundation_Directory.append('Foundation Directory'.lower() in words)
-        Preqin.append('Preqin'.lower() in words)
-        Moodys.append('Moodys'.lower() in words)
-        SimplyAnalytics.append('SimplyAnalytics'.lower() in words)
-        Global_Financial_Data.append('Global Financial Data'.lower() in words)
-        SRDS.append('SRDS'.lower() in words)
-        UN_Comtrade.append('UN Comtrade'.lower() in words)
-        Bests.append('Bests'.lower() in words)
-        WARC.append('WARC'.lower() in words)
-        Bizcomps.append('Bizcomps'.lower() in words)
+        # Check text for term matches
+        for i in list(range(len(canonicals))):
+            match = []
+            # Check each variation, conditional to arguments
+            for index, row in term_include[term_include['Canonical'] == canonicals[i]].iterrows():
+                if row['MatchPunctuation'] and row['MatchCase']:
+                    match.append(row['Variation'].replace(" ", "") in words_pc)
+                elif row['MatchPunctuation']:
+                    match.append(row['Variation'].replace(" ", "").lower() in words_p)
+                elif row['MatchCase']:
+                    match.append(row['Variation'].replace(" ", "").translate(str.maketrans('', '', string.punctuation)) in words_c)
+                else:
+                    match.append(row['Variation'].replace(" ", "").translate(str.maketrans('', '', string.punctuation)).lower() in words_)
+            # Combine any matches for the canonical term
+            globals()[f'{canonicals_clean[i]}'].append(any(match))
+        del i, match, index, row
 
 # ID where any database appears
 any_database = []
