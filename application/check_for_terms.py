@@ -39,6 +39,25 @@ def list_files(filepath = os.getcwd(), filetype = '.pdf'):
                 paths.append(os.path.join(root, file))
     return(paths)
 
+# Remove terms and flagged variations from text
+def exclude_terms(terms_df, text):
+    # terms_df must be a pandas dataframe with columns:
+    ## 'Variation' = terms to exclude
+    ## 'MatchPunctuation' = logical flag where True means punctuation must match
+    ## 'MatchCase' = logical flag where True means case must match
+    # text must be a single character string
+    for index, row in terms_df.iterrows():
+        text = text.replace(row['Variation'], '')
+        if row['MatchPunctuation'] and row['MatchCase']:
+            continue
+        if row['MatchPunctuation']:
+            text = text.replace(row['Variation'].lower(), '')
+        if row['MatchCase']:
+            text = text.replace(row['Variation'].translate(str.maketrans('', '', string.punctuation)), '')
+        if not row['MatchPunctuation'] and not row['MatchCase']:
+            text = text.replace(row['Variation'].translate(str.maketrans('', '', string.punctuation)).lower(), '')
+    return(text)
+
 
 """
 Run procedure
@@ -69,38 +88,23 @@ for file in list_files(data_dir):
     
     # When content metadata are missing
     if parser.from_file(file)['content'] is None:
-        
+        # Fill with Excel NA
         for can in canonicals_clean:
             globals()[f'{can}'].append('#N/A')
         del can
       
     # When content metadata are present
-    
     # TO DO: use terms dynamically
     # TO DO: set options to flag which terms happen at which stage (e.g.: case-sensitive)
     # TO DO: handle variations on a term (e.g.: BCIQ or BioCentury) dynamically
     else:
-        # Extract the text content in four versions
-        ## All versions remove line breaks and white space
+        # Extract text content in four variations
+        ## All versions remove line breaks, white space, and excluded terms
         ## words_pc retains *p*unctuation and *c*apitalization...
-        words_pc = parser.from_file(file)['content'].replace("\n", "").replace(" ", "")
-        words_p = words_pc.lower()
-        words_c = words_pc.translate(str.maketrans('', '', string.punctuation))
-        words = words_pc.translate(str.maketrans('', '', string.punctuation)).lower()
-        
-        # Remove/Exclude terms
-        ## Ignores white space; Heeds punctuation and case
-        # TO DO: loop to clear all Exclude-flagged terms
-        for index, row in term_exclude.iterrows():
-            if row['MatchPunctuation'] and row['MatchCase']:
-                words = words.replace(row['Variation'], "")
-            elif row['MatchPunctuation']:
-                row['Variation']
-            elif row['MatchCase']:
-                row['Variation']
-            else:
-                row['Variation']
-            #words = words.replace("bloomberg.com", "").replace("Bloomberg.com", "")
+        words_pc = exclude_terms(term_exclude, parser.from_file(file)['content'].replace("\n", "").replace(" ", ""))
+        words_p = exclude_terms(term_exclude, words_pc.lower())
+        words_c = exclude_terms(term_exclude, words_pc.translate(str.maketrans('', '', string.punctuation)))
+        words_ = exclude_terms(term_exclude, words_pc.translate(str.maketrans('', '', string.punctuation)).lower())
         
         # Check for matches with punctuation and case
         
