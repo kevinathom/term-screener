@@ -50,12 +50,10 @@ def exclude_terms(terms_df, text):
     # text must be a single character string
     for index, row in terms_df.iterrows():
         text = text.replace(row['Variation'].replace(" ", ""), '')
-        if row['MatchPunctuation'] and row['MatchCase']:
-            continue
-        if row['MatchPunctuation']:
-            text = text.replace(row['Variation'].replace(" ", "").lower(), '')
-        if row['MatchCase']:
+        if not row['MatchPunctuation']:
             text = text.replace(row['Variation'].replace(" ", "").translate(str.maketrans('', '', string.punctuation)), '')
+        if not row['MatchCase']:
+            text = text.replace(row['Variation'].replace(" ", "").lower(), '')
         if not row['MatchPunctuation'] and not row['MatchCase']:
             text = text.replace(row['Variation'].replace(" ", "").translate(str.maketrans('', '', string.punctuation)).lower(), '')
     return(text)
