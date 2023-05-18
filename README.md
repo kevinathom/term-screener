@@ -7,12 +7,12 @@ Given a set of PDF files encoded with text metadata and a complete terms input t
 ## Instructions
 1. Identify a directory containing all PDF files to search. The script will search subdirectories.
 2. Update *check_for_terms.py*, line 21, to reflect the path for the above directory.
-3. Following the format of *terms_template.csv*, list all terms and variations to find. Name this file *terms.csv* and place the file in the base directory Column descriptions:
-  - Canonical
-  - Variation
-  - Exclude
-  - MatchPunctuation
-  - MatchCase
+3. Following the format of *terms_template.csv*, list all terms and variations to find. Name this file *terms.csv* and place the file in the base directory. Column descriptions:
+   - Canonical - The shared name you want to use for a given term or set of term variations; The results report by unique Canonical
+   - Variation - A specific instance of a term that the tool should match; Any Variation of a single Canonical will flag the Canonical as present
+   - Exclude - True will remove the term from text before searching; False will search for the term
+   - MatchPunctuation - True will match based on punctuation; False will ignore punctuation
+   - MatchCase - True will match based on case/capitalization; False will ignore case/capitalization
 4. Run *check_for_terms.py*.
 5. Find results in the provided directory, filename *results_*YYYY-MM-DD*.csv*
 
