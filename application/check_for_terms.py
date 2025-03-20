@@ -1,30 +1,52 @@
 # -*- coding: utf-8 -*-
 """
-###
-Extract PDF text elements and screen for given terms
-###
-
+purpose: Extract PDF text elements and screen for given terms
 @author: kevinat
-"""
-
-"""
-Specify file locations
 
 Note:
     tika 1.23.1 fails in Windows 10
     consider installing older version:
         pip install tika==1.23
 """
-from datetime import date
-import pandas as pd
-
-data_dir = "C:\\Users\\kevinat\\Documents\\GitHub\\term-screener\\data\\"
-term_set = pd.read_csv(data_dir + "terms.csv")
-
 
 """
 Build preliminary functions
 """
+# Run file/directory selection dialog
+import tkinter as tk
+from tkinter import filedialog
+
+def open_file_dialog(your_title = "Select a file"):
+    # Initialize tkinter
+    root = tk.Tk()
+    # Hide the main window
+    root.withdraw()
+    # Show the file dialog and get the selected file path
+    file_path = filedialog.askopenfilename(
+        title = your_title,
+        filetypes = (
+            ("Comma-separated values", "*.csv"),
+        )
+    )
+    # Clean up the tkinter instance
+    root.destroy()
+    return file_path
+
+def open_directory_dialog(your_title = "Select a directory"):
+    """Open a directory selection dialog and return the selected directory path."""
+    # Initialize tkinter
+    root = tk.Tk()
+    # Hide the main window
+    root.withdraw()
+    # Show the directory dialog and get the selected directory path
+    directory_path = filedialog.askdirectory(
+        title = your_title,
+        mustexist = True
+    ) + "/"
+    # Clean up the tkinter instance
+    root.destroy()
+    return directory_path
+
 # List relevant paths and files
 import os
 
@@ -62,6 +84,12 @@ def exclude_terms(terms_df, text):
 """
 Run procedure
 """
+import pandas as pd
+# Specify file locations
+term_set = open_file_dialog(your_title = "Select your terms file")
+term_set = pd.read_csv(term_set)
+data_dir = open_directory_dialog(your_title = "Select your directory of PDF files")
+
 # Separate include/exclude terms
 term_include = term_set[~term_set['Exclude']]
 term_exclude = term_set[term_set['Exclude']]
@@ -83,7 +111,7 @@ from tika import parser
 
 for file in list_files(data_dir):
     # List the filename
-    papers.append(file[(file.rindex('\\') + 1):-4])
+    papers.append(file[(file.rindex('/') + 1):-4])
     
     # When content metadata are missing
     if parser.from_file(file)['content'] is None:
@@ -130,4 +158,5 @@ for i in list(range(len(canonicals))):
     result[canonicals[i]] = globals()[f'{canonicals_clean[i]}']
 del i
 
+from datetime import date
 result.to_csv(data_dir + "results_" + str(date.today()) + ".csv", index = None, header = True)
