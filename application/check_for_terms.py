@@ -119,7 +119,7 @@ for file in list_files(data_dir):
     papers.append(file[(file.rindex('/') + 1):-4])
     
     # When content metadata are missing
-    if extract_text(file)['content'] is None:
+    if extract_text(file) is None:
         # Fill with Excel NA
         for can in canonicals_clean:
             globals()[f'{can}'].append('#N/A')
@@ -131,7 +131,7 @@ for file in list_files(data_dir):
         # Extract text content in four variations
         ## All variations remove line breaks, white space, and excluded terms
         ## words_pc retains *p*unctuation and *c*apitalization...
-        words_pc = exclude_terms(term_exclude, extract_text(file)['content'].replace("\n", "").replace(" ", ""))
+        words_pc = exclude_terms(term_exclude, extract_text(file).replace("\n", "").replace(" ", ""))
         words_p = exclude_terms(term_exclude, words_pc.lower())
         words_c = exclude_terms(term_exclude, words_pc.translate(str.maketrans('', '', string.punctuation)))
         words_ = exclude_terms(term_exclude, words_pc.translate(str.maketrans('', '', string.punctuation)).lower())
