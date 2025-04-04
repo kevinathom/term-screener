@@ -11,14 +11,14 @@ Given a directory of PDF files encoded with text metadata and a complete terms i
    - Exclude - True will remove the term from text before searching; False will search for the term
    - MatchPunctuation - True will match based on punctuation; False will ignore punctuation
    - MatchCase - True will match based on case/capitalization; False will ignore case/capitalization
-2. Place all PDF files to search within one directory. Files can be in subdirectories.
-1. Run `check_for_terms.py`.
+1. Place all PDF files to search within one directory. Files can be in subdirectories.
+1. Run `check_for_terms.exe` on Windows or `check_for_terms.py` using Python.
    1. When prompted, select your CSV file of terms to find.
    1. When prompted, select a directory containing all PDF files to search. The script will search this directory and its subdirectories.
+   1. You will be prompted when the process completes.
 1. Find results in your directory of PDFs, filename `results_*YYYY-MM-DD*.csv`.
 
 ## Aspirations
 - Add error-handling for missing/unexpected values in the terms input table.
-- Make script executable.
 
 [![License: GPL v3](https://img.shields.io/badge/License-GPLv3-blue.svg)](https://www.gnu.org/licenses/gpl-3.0)
