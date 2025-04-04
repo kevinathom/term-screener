@@ -18,7 +18,4 @@ Given a directory of PDF files encoded with text metadata and a complete terms i
    1. You will be prompted when the process completes.
 1. Find results in your directory of PDFs, filename `results_*YYYY-MM-DD*.csv`.
 
-## Aspirations
-- Add error-handling for missing/unexpected values in the terms input table.
-
 [![License: GPL v3](https://img.shields.io/badge/License-GPLv3-blue.svg)](https://www.gnu.org/licenses/gpl-3.0)
