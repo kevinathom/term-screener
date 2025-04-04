@@ -133,8 +133,6 @@ for can in canonicals_clean:
 del can
 
 # Run algorithm on PDF files
-
-
 for file in list_files(data_dir):
     # List the filename
     papers.append(file[(file.rindex('/') + 1):-4])
