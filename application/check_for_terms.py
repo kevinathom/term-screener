@@ -2,10 +2,6 @@
 """
 purpose: Extract PDF text elements and screen for given terms
 @author: kevinat
-
-Note:
-tika 1.23.1 fails in Windows 10.
-Consider installing older version: pip install tika==1.23
 """
 
 """
@@ -72,6 +68,16 @@ def list_files(filepath = os.getcwd(), filetype = '.pdf'):
                 paths.append(os.path.join(root, file))
     return(paths)
 
+# Read text from a PDF file
+import fitz # a.k.a. PyMuPDF
+
+def read_pdf(file):
+    doc = fitz.open(file)
+    text = ""
+    for page in doc:
+        text += page.get_text()
+    return(text)
+
 # Remove terms and flagged variations from text
 import string
 
@@ -116,16 +122,12 @@ for can in canonicals_clean:
 del can
 
 # Run algorithm on PDF files
-import tika
-tika.initVM()
-from tika import parser
-
 for file in list_files(data_dir):
     # List the filename
     papers.append(file[(file.rindex('/') + 1):-4])
     
     # When content metadata are missing
-    if parser.from_file(file)['content'] is None:
+    if read_pdf(file)['content'] is None:
         # Fill with Excel NA
         for can in canonicals_clean:
             globals()[f'{can}'].append('#N/A')
@@ -137,7 +139,7 @@ for file in list_files(data_dir):
         # Extract text content in four variations
         ## All variations remove line breaks, white space, and excluded terms
         ## words_pc retains *p*unctuation and *c*apitalization...
-        words_pc = exclude_terms(term_exclude, parser.from_file(file)['content'].replace("\n", "").replace(" ", ""))
+        words_pc = exclude_terms(term_exclude, read_pdf(file)['content'].replace("\n", "").replace(" ", ""))
         words_p = exclude_terms(term_exclude, words_pc.lower())
         words_c = exclude_terms(term_exclude, words_pc.translate(str.maketrans('', '', string.punctuation)))
         words_ = exclude_terms(term_exclude, words_pc.translate(str.maketrans('', '', string.punctuation)).lower())
