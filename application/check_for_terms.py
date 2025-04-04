@@ -4,15 +4,14 @@ purpose: Extract PDF text elements and screen for given terms
 @author: kevinat
 
 Note:
-    tika 1.23.1 fails in Windows 10
-    consider installing older version:
-        pip install tika==1.23
+tika 1.23.1 fails in Windows 10.
+Consider installing older version: pip install tika==1.23
 """
 
 """
 Build preliminary functions
 """
-# Run file/directory selection dialog
+# Show file/directory selection dialog
 import tkinter as tk
 from tkinter import filedialog
 
@@ -33,7 +32,6 @@ def open_file_dialog(your_title = "Select a file"):
     return file_path
 
 def open_directory_dialog(your_title = "Select a directory"):
-    """Open a directory selection dialog and return the selected directory path."""
     # Initialize tkinter
     root = tk.Tk()
     # Hide the main window
@@ -46,6 +44,19 @@ def open_directory_dialog(your_title = "Select a directory"):
     # Clean up the tkinter instance
     root.destroy()
     return directory_path
+
+# Show completion message window
+from tkinter import messagebox
+
+def show_completion_message(your_title = "Process Complete", your_message = "The process is complete."):
+    # Initialize tkinter
+    root = tk.Tk()
+    # Hide the main window
+    root.withdraw()
+    # Show the message
+    messagebox.showinfo(your_title, your_message)
+    # Clean up the tkinter instance
+    root.destroy()
 
 # List relevant paths and files
 import os
@@ -160,3 +171,6 @@ del i
 
 from datetime import date
 result.to_csv(data_dir + "results_" + str(date.today()) + ".csv", index = None, header = True)
+
+# Confirm completion
+show_completion_message(your_message = "Find results in " + data_dir + "results_" + str(date.today()) + ".csv")
