@@ -68,6 +68,27 @@ def list_files(filepath = os.getcwd(), filetype = '.pdf'):
                 paths.append(os.path.join(root, file))
     return(paths)
 
+# Catch empty or errored PDF files
+from pdfminer.high_level import extract_text # Install pdfminer.six, not pdfminer
+from pdfminer.pdfparser import PDFSyntaxError
+
+def can_extract_text(file):
+    # Check file exists and isn't empty
+    if not os.path.exists(file):
+        return False # File does not exist
+    elif os.path.getsize(file) == 0:
+        return False # File is empty"
+    # Check file for extractable text
+    try:
+        text = extract_text(file)
+        if text.strip() == "":
+            return False # No extractable text found in PDF
+        return True, text
+    except PDFSyntaxError:
+        return False # Not a valid PDF file
+    except Exception:
+        return False # Extraction error
+
 # Remove terms and flagged variations from text
 import string
 
@@ -112,21 +133,21 @@ for can in canonicals_clean:
 del can
 
 # Run algorithm on PDF files
-from pdfminer.high_level import extract_text # Install pdfminer.six, not pdfminer
+
 
 for file in list_files(data_dir):
     # List the filename
     papers.append(file[(file.rindex('/') + 1):-4])
     
-    # When content metadata are missing
-    if extract_text(file) is None:
+    # Check and note missing content
+    if not can_extract_text(file):
         # Fill with Excel NA
         for can in canonicals_clean:
             globals()[f'{can}'].append('#N/A')
         del can
         any_match.append('#N/A')
       
-    # When content metadata are present
+    # Process content
     else:
         # Extract text content in four variations
         ## All variations remove line breaks, white space, and excluded terms
