@@ -12,7 +12,7 @@ Given a directory of PDF files encoded with text metadata and a complete terms i
    - MatchPunctuation - True will match based on punctuation; False will ignore punctuation
    - MatchCase - True will match based on case/capitalization; False will ignore case/capitalization
 1. Place all PDF files to search within one directory. Files can be in subdirectories.
-1. Run `check_for_terms.exe` on Windows or `check_for_terms.py` using Python.
+1. Run [`check_for_terms.exe`](https://penno365-my.sharepoint.com/:u:/g/personal/kevinat_upenn_edu/EZogBD65CyRFrRQBOh1H_j4BbnWUOcqK7NQdSDNK9ioGeg?e=0tngYK) on Windows or `check_for_terms.py` using Python.
    1. When prompted, select your CSV file of terms to find.
    1. When prompted, select a directory containing all PDF files to search. The script will search this directory and its subdirectories.
    1. You will be prompted when the process completes.
