@@ -5,4 +5,6 @@
 - [pdfminer.six documentation](https://pdfminersix.readthedocs.io/en/latest/)
 
 ## Aspirations
-- Add error-handling for missing/unexpected values in the terms input table.
+- Replace True/False results for each term with a term count
+- Add error-handling for missing/unexpected values in the terms input table
+- Add integrated testing script
